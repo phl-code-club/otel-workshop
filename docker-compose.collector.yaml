@@ -1,0 +1,11 @@
+services:
+  collector:
+    image: docker.io/otel/opentelemetry-collector:0.147.0
+    ports:
+      - 4317:4317
+      - 4318:4318
+      - 55679:55679
+      - 1777:1777
+      - 13133:13133
+    volumes:
+      - ./otel/:/etc/otelcol/
