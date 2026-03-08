@@ -15,6 +15,10 @@
 
 ***TODO***
 
+## Grafana
+
+The `Grafana` container exposes port `3000`. Just load up `http//localhost:3000`.
+
 ## Starting the Services
 
 To bring up the services defined here you can run `make up`. This will start the services in the current terminal. If you want to start them detached you can use `make ARGS="-d" up`.
