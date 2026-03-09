@@ -7,6 +7,9 @@ receivers:
         endpoint: 0.0.0.0:4318
 
 exporters:
+  otlp_http/loki:
+    endpoint: http://loki:3100/otlp
+
   otlp_grpc/tempo:
     endpoint: tempo:4317
     tls:
@@ -39,10 +42,9 @@ service:
         - otlp
       exporters:
         - debug
-        - otlp_grpc/tempo
     logs:
       receivers:
         - otlp
       exporters:
         - debug
-        - otlp_grpc/tempo
+        - otlp_http/loki
