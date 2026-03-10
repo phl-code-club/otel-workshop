@@ -1,0 +1,33 @@
+volumes:
+  tempo:
+
+services:
+  tempo:
+    image: grafana/tempo:latest
+    # These two flags are pretty straightforward
+    # -target=all just tells Tempo to run all of it's services inside a single process.
+    # -config=path/to/config just tells Tempo where to find its config file.
+    command: "-target=all -config.file=/etc/tempo.yaml"
+    volumes:
+      - ./tempo.yaml:/etc/tempo.yaml
+      # We use a named volume here to avoid weird permissions issues with this container
+      - tempo:/var/tempo/
+    ports:
+      - "3200:3200" # tempo
+    depends_on:
+      - redpanda
+  # Apparently Tempo REQUIRES a Kafka queue now, and RedPanda is the easiest to setup
+  redpanda:
+    image: redpandadata/redpanda:latest
+    ports:
+      - "9092:9092" # Kafka API for clients
+    # Starts our Kafka compatible queue. The flags are just used for local dev:
+    # --overprovisioned tells RedPanda to skip resource checks when it starts
+    # --mode=dev-container tells RedPanda to use local development friendly defaults for things like storage guarantees and safety checks
+    # --kafka-addr=PLAINTEXT:0.0.0.0:9092 tells RedPanda to run the Kafka compatible API on port 9092 and accept all traffic unenecrypted
+    # --advertise-kafka-addr=PLAINTEXT:0.0.0.0:9092 is the address that RedPanda gives to Kafka clients when they are looking for a broker
+    command: >
+      redpanda start --overprovisioned
+      --mode=dev-container
+      --kafka-addr=PLAINTEXT://0.0.0.0:9092
+      --advertise-kafka-addr=PLAINTEXT://redpanda:9092

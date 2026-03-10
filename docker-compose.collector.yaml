@@ -1,6 +1,9 @@
+include:
+  - docker-compose.tempo.yaml
+  - docker-compose.loki.yaml
 services:
   collector:
-    image: docker.io/otel/opentelemetry-collector:0.147.0
+    image: docker.io/otel/opentelemetry-collector:latest
     ports:
       - 4317:4317
       - 4318:4318
@@ -8,4 +11,7 @@ services:
       - 1777:1777
       - 13133:13133
     volumes:
-      - ./otel/:/etc/otelcol/
+      - ./otel-config.yaml:/etc/otelcol/config.yaml
+    depends_on:
+      - tempo
+      - loki

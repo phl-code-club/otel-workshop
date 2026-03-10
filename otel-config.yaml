@@ -7,6 +7,14 @@ receivers:
         endpoint: 0.0.0.0:4318
 
 exporters:
+  otlp_http/loki:
+    endpoint: http://loki:3100/otlp
+
+  otlp_grpc/tempo:
+    endpoint: tempo:4317
+    tls:
+      insecure: true
+
   debug:
     verbosity: detailed
     sampling_initial: 5
@@ -24,11 +32,19 @@ service:
   extensions: [health_check, pprof, zpages]
   pipelines:
     traces:
-      receivers: [otlp]
-      exporters: [debug]
+      receivers:
+        - otlp
+      exporters:
+        - debug
+        - otlp_grpc/tempo
     metrics:
-      receivers: [otlp]
-      exporters: [debug]
+      receivers:
+        - otlp
+      exporters:
+        - debug
     logs:
-      receivers: [otlp]
-      exporters: [debug]
+      receivers:
+        - otlp
+      exporters:
+        - debug
+        - otlp_http/loki

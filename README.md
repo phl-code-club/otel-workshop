@@ -15,6 +15,10 @@
 
 ***TODO***
 
+## Grafana
+
+The `Grafana` container exposes port `3000`. Just load up `http//localhost:3000`.
+
 ## Starting the Services
 
 To bring up the services defined here you can run `make up`. This will start the services in the current terminal. If you want to start them detached you can use `make ARGS="-d" up`.
@@ -29,3 +33,13 @@ Once you have the collector running you can run [telemetrygen](https://github.co
   - The number of signals to send
 
 For example we could use the following to send 5 logs: `make SIGNAL=logs COUNT=5 telemetrygen`.
+
+## Testing Tempo
+
+Once Tempo is running, if you send some dummy traces in using `telemetrygen` (*See [Testing Collector](#testing-collector)*), you can query Tempo for those same traces. You can use [TraceQL](https://grafana.com/docs/tempo/latest/traceql/construct-traceql-queries/) to search for traces, like so:
+
+`curl http://localhost:3200/api/search -d '{resource.service.name = "telemetrygen"}'`
+
+Then you can take the trace id's from that output and get additional information using:
+
+`curl http://localhost:3200/api/traces/$TRACE_ID`
