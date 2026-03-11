@@ -1,6 +1,7 @@
 include:
   - docker-compose.tempo.yaml
   - docker-compose.loki.yaml
+  - docker-compose.prometheus.yaml
 services:
   collector:
     image: docker.io/otel/opentelemetry-collector:latest
@@ -15,3 +16,4 @@ services:
     depends_on:
       - tempo
       - loki
+      - prometheus
