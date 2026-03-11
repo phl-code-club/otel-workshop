@@ -9,11 +9,26 @@ datasources:
     basicAuth: false
     isDefault: false
     version: 1
-    editable: false
+    editable: true
     apiVersion: 1
     uid: tempo
     jsonData:
       httpMethod: GET
+    correlations:
+      - uid: bffnca20y3ev4d
+        sourceUID: tempo
+        orgId: 1
+        targetUID: loki
+        label: Logs
+        description: "Trace -> Logs"
+        config:
+          field: traceID
+          target:
+            editorMode: builder
+            expr: '{trace_id="$traceID"} |= `` | logfmt | __error__=``'
+            queryType: range
+        provisioned: false
+        type: query
   - name: Loki
     type: loki
     access: proxy
@@ -22,9 +37,17 @@ datasources:
     basicAuth: false
     isDefault: false
     version: 1
-    editable: false
+    editable: true
     apiVersion: 1
     uid: loki
+    jsonData:
+      derivedFields:
+        - datasourceUid: tempo
+          name: TraceID
+          matcherRegex: trace_id
+          matcherType: label
+          urlDisplayLabel: "View Trace"
+          url: "$${__value.raw}"
   - name: prometheus
     type: prometheus
     access: proxy
