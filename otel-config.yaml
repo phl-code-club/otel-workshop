@@ -15,6 +15,10 @@ exporters:
     tls:
       insecure: true
 
+  prometheus:
+    endpoint: "0.0.0.0:9090"
+    translation_strategy: "UnderscoreEscapingWithoutSuffixes"
+
   debug:
     verbosity: detailed
     sampling_initial: 5
@@ -42,6 +46,7 @@ service:
         - otlp
       exporters:
         - debug
+        - prometheus
     logs:
       receivers:
         - otlp
