@@ -26,10 +26,12 @@ export async function validateJWT(
     const decodedToken = jwt.verify(token, secret)
     // req locals
     if (typeof decodedToken === "string") {
-      /// TODO:what is this stringggg 
+      throw new Error("token should not be a string representation")
     }
 
-    //TODO: store in locals
+    const userID = decodedToken.id
+
+    res.locals.user = userID
 
     next()
   }

@@ -1,10 +1,12 @@
 import express from "express";
 import * as dotenv from "dotenv";
-// import { validateWsId } from "./middleware/validateAPIKey";
+import { validateJWT } from "../middleware/validateToken";
+import authRouter from "../controllers/auth";
 
 dotenv.config()
 
 const app = express()
-
+app.use(express.json())
+app.use("/authservice", validateJWT, authRouter)
 
 export default app
