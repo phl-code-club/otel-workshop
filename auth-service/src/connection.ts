@@ -1,8 +1,8 @@
-import { Pool } from "pg";
+import { Client } from "pg";
 import { logger } from "./logger.js";
 
 
-const pool = new Pool({
+const client = new Client({
   host: process.env.DB_HOST ?? "localhost",
   user: "phlcodeclub",
   database: "otel",
@@ -13,7 +13,7 @@ const pool = new Pool({
 
 export const connectToDB = async () => {
   try {
-    await pool.connect();
+    await client.connect();
     logger.info("Database connected");
   } catch (error) {
     logger.error("Database connection error:", { error });
@@ -21,4 +21,4 @@ export const connectToDB = async () => {
   }
 };
 
-export default pool;
+export default client;
