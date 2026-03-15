@@ -1,28 +1,27 @@
-const jwt = require("jsonwebtoken")
+import jwt from "jsonwebtoken"
+import { logger } from "./logger.js"
+import { SECRET } from "./const.js"
 
 export async function generateJWT(
   userId: number,
 ): Promise<string> {
 
   try {
-    const key = process.env.SECRET
-    if (!key) throw new Error("SECRET not defined")
-
     const payload = {
       iss: "auth-service",
       aud: "user-profile-service",
       id: userId
     }
 
-    const token = await jwt.sign(payload, key, {
+    const token = jwt.sign(payload, SECRET, {
       algorithm: "HS256",
       expiresIn: "1 day"
     })
 
     return token
   }
-  catch (err) {
-    console.error("Error creating token", err)
-    throw err
+  catch (error) {
+    logger.error("Error creating token", { error })
+    throw error
   }
 }

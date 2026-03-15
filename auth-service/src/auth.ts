@@ -1,9 +1,10 @@
-import db from "../db/connection";
+import db from "./connection.js";
 import { Router, type Request, type Response } from "express";
 import { z } from "zod";
-import { generateJWT } from "../utils/token";
-import { validateJWT } from "../middleware/validateToken";
+import { generateJWT } from "./token.js";
+import { validateJWT } from "./validateToken.js";
 import bcrypt from "bcrypt"
+import { logger } from "./logger.js";
 
 const userSchema = z.object({
   email: z.email({
@@ -30,7 +31,7 @@ async function signUp(req: Request, res: Response) {
     }
 
     const result = await db.query(
-      "INSERT INTO Users (email, password_hash) VALES ($1, $2) RETURNING *",
+      "INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id, email, created_at;",
       [safeParse.data.email, passwordHash]
     )
 
@@ -43,8 +44,8 @@ async function signUp(req: Request, res: Response) {
 
     return res.status(201).json({ user: user, token })
   }
-  catch (err) {
-    console.error("Error creating user:", err)
+  catch (error) {
+    logger.warn("Error creating user:", { error })
     return res.status(500).json({ error: "Internal server error" })
   }
 }
@@ -58,7 +59,7 @@ async function signIn(req: Request, res: Response) {
     }
 
     const result = await db.query(
-      "SELECT * FROM Users WHERE email = $1",
+      "SELECT id, email, created_at, password_hash FROM users WHERE email = $1",
       [safeParse.data.email]
     )
 
@@ -77,24 +78,25 @@ async function signIn(req: Request, res: Response) {
     if (!token) {
       throw new Error("error generating token")
     }
-
-    return res.status(201).json({ user: user, token })
+    delete user.password_hash
+    return res.status(201).json({ user, token })
   }
-  catch (err) {
-    console.warn("Error signing in", err)
+  catch (error) {
+    console.error(error)
+    logger.warn("Error signing in", { error })
     return res.status(401).json({ error: "error authorizing user" })
   }
 }
 
 
-async function getUser(req: Request, res: Response) {
+async function getUser(_req: Request, res: Response) {
   try {
     const userID = res.locals.user
     if (!userID) {
       throw new Error("no userID")
     }
 
-    const result = await db.query("SELECT * FROM Users WHERE id = $1",
+    const result = await db.query("SELECT id, email, created_at FROM users WHERE id = $1",
       [userID])
     if (result.rowCount === 0) {
       throw new Error("User does not exist")
@@ -104,9 +106,9 @@ async function getUser(req: Request, res: Response) {
 
     return res.status(201).json({ user: user })
   }
-  catch (err) {
-    console.warn("Error fetching user", err)
-    return res.status(500).json({ error: "error authorizing user" })
+  catch (error) {
+    console.warn("Error fetching user", { error })
+    return res.status(401).json({ error: "error authorizing user" })
   }
 }
 

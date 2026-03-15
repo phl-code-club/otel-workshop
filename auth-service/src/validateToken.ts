@@ -1,5 +1,7 @@
 import { NextFunction, type Request, type Response } from "express"
 import jwt from "jsonwebtoken"
+import { SECRET } from "./const.js"
+import { logger } from "./logger.js"
 
 export async function validateJWT(
   req: Request,
@@ -18,13 +20,8 @@ export async function validateJWT(
       throw new Error("missing token")
     }
 
-    const secret = process.env.SECRET
-    if (!secret) {
-      throw new Error("SECRET not defined")
-    }
-
-    const decodedToken = jwt.verify(token, secret)
-    // req locals
+    console.log(token)
+    const decodedToken = jwt.verify(token, SECRET)
     if (typeof decodedToken === "string") {
       throw new Error("token should not be a string representation")
     }
@@ -35,8 +32,8 @@ export async function validateJWT(
 
     next()
   }
-  catch (err) {
-    console.warn("Error validating token", err)
-    return res.status(401).json({ error: "unauthorization" })
+  catch (error) {
+    logger.warn("Error validating token", { error })
+    return res.status(401).json({ error: "unauthorized" })
   }
 }

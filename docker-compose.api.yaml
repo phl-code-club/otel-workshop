@@ -1,0 +1,31 @@
+services:
+  auth-api:
+    restart: always
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:18
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres:/data/db
+      - ./db/:/docker-entrypoint-initdb.d/
+    environment:
+      - POSTGRES_USER=phlcodeclub
+      - POSTGRES_PASSWORD=super-secret-password
+      - POSTGRES_DB=otel
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U phlcodeclub -d otel"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  postgres:
