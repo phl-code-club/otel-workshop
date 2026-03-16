@@ -11,6 +11,7 @@ services:
       - 55679:55679
       - 1777:1777
       - 13133:13133
+      - 8888:8888
     volumes:
       - ./otel-config.yaml:/etc/otelcol/config.yaml
     command: --config=/etc/otelcol/config.yaml
