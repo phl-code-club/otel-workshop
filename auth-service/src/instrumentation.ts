@@ -7,6 +7,7 @@ import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-grpc';
 import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-grpc';
 import { BatchLogRecordProcessor } from '@opentelemetry/sdk-logs'
+import { CompositePropagator, W3CBaggagePropagator, W3CTraceContextPropagator } from '@opentelemetry/core';
 
 const sdk = new NodeSDK({
   traceExporter: new OTLPTraceExporter(),
@@ -18,6 +19,12 @@ const sdk = new NodeSDK({
       new OTLPLogExporter()
     )
   ],
+  textMapPropagator: new CompositePropagator({
+    propagators: [
+      new W3CTraceContextPropagator(),
+      new W3CBaggagePropagator()
+    ]
+  }),
   instrumentations: [getNodeAutoInstrumentations()],
 });
 

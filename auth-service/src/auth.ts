@@ -5,7 +5,7 @@ import { generateJWT } from "./token.js";
 import { validateJWT } from "./validateToken.js";
 import bcrypt from "bcrypt"
 import { logger } from "./logger.js";
-import { trace } from "@opentelemetry/api";
+import { SpanStatusCode, trace } from "@opentelemetry/api";
 
 const tracer = trace.getTracer("auth-endpoint")
 
@@ -25,6 +25,9 @@ async function signUp(req: Request, res: Response) {
     const safeParse = userSchema.safeParse(req.body)
 
     if (!safeParse.success) {
+      span.recordException(safeParse.error)
+      span.setStatus({ code: SpanStatusCode.ERROR })
+      logger.warn("User input error", { error: safeParse.error })
       span.end()
       return res.status(400).json({ error: safeParse.error.issues })
     }
@@ -52,6 +55,16 @@ async function signUp(req: Request, res: Response) {
     return res.status(201).json({ user: user, token })
   }
   catch (error) {
+    let err: Error
+    if (error instanceof Error) {
+      err = error
+    } else {
+      err = new Error(`Unexpected error: ${JSON.stringify(error)}`, {
+        cause: error
+      })
+    }
+    span.recordException(err)
+    span.setStatus({ code: SpanStatusCode.ERROR })
     logger.warn("Error creating user:", { error })
     span.end()
     return res.status(500).json({ error: "Internal server error" })
@@ -64,6 +77,9 @@ async function signIn(req: Request, res: Response) {
     const safeParse = userSchema.safeParse(req.body)
 
     if (!safeParse.success) {
+      span.recordException(safeParse.error)
+      span.setStatus({ code: SpanStatusCode.ERROR })
+      logger.warn("User input error", { error: safeParse.error })
       span.end()
       return res.status(400).json({ error: safeParse.error.issues })
     }
@@ -97,6 +113,16 @@ async function signIn(req: Request, res: Response) {
     return res.status(201).json({ user, token })
   }
   catch (error) {
+    let err: Error
+    if (error instanceof Error) {
+      err = error
+    } else {
+      err = new Error(`Unexpected error: ${JSON.stringify(error)}`, {
+        cause: error
+      })
+    }
+    span.recordException(err)
+    span.setStatus({ code: SpanStatusCode.ERROR })
     logger.warn("Error signing in", { error })
     span.end()
     return res.status(401).json({ error: "error authorizing user" })
@@ -105,6 +131,7 @@ async function signIn(req: Request, res: Response) {
 
 
 async function getUser(_req: Request, res: Response) {
+  const span = trace.getActiveSpan();
   try {
     const userID = res.locals.user
     if (!userID) {
@@ -122,6 +149,18 @@ async function getUser(_req: Request, res: Response) {
     return res.status(201).json({ user: user })
   }
   catch (error) {
+    let err: Error
+    if (error instanceof Error) {
+      err = error
+    } else {
+      err = new Error(`Unexpected error: ${JSON.stringify(error)}`, {
+        cause: error
+      })
+    }
+    if (span) {
+      span.recordException(err)
+      span.setStatus({ code: SpanStatusCode.ERROR })
+    }
     console.warn("Error fetching user", { error })
     return res.status(401).json({ error: "error authorizing user" })
   }

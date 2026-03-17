@@ -25,9 +25,8 @@ datasources:
           field: traceID
           target:
             editorMode: builder
-            expr: '{trace_id="$traceID"} |= `` | logfmt | __error__=``'
+            expr: '{service_name=~".+"} | trace_id=`$$traceID`'
             queryType: range
-        provisioned: false
         type: query
   - name: Loki
     type: loki

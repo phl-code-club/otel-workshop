@@ -2,7 +2,7 @@ import { NextFunction, type Request, type Response } from "express"
 import jwt from "jsonwebtoken"
 import { SECRET } from "./const.js"
 import { logger } from "./logger.js"
-import { trace } from "@opentelemetry/api"
+import { SpanStatusCode, trace } from "@opentelemetry/api"
 
 const tracer = trace.getTracer("validate-jwt-middleware");
 
@@ -23,7 +23,6 @@ export async function validateJWT(
         throw new Error("missing token")
       }
 
-      console.log(token)
       const decodedToken = jwt.verify(token, SECRET)
       if (typeof decodedToken === "string") {
         throw new Error("token should not be a string representation")
@@ -36,7 +35,16 @@ export async function validateJWT(
       next()
     }
     catch (error) {
-      span.setAttribute("error", error instanceof Error ? error.message : JSON.stringify(error))
+      let err: Error
+      if (error instanceof Error) {
+        err = error
+      } else {
+        err = new Error(`Unexpected error: ${JSON.stringify(error)}`, {
+          cause: error
+        })
+      }
+      span.recordException(err)
+      span.setStatus({ code: SpanStatusCode.ERROR })
       logger.warn("Error validating token", { error })
       span.end()
       return res.status(401).json({ error: "unauthorized" })
