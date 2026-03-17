@@ -4,15 +4,17 @@ include:
   - docker-compose.prometheus.yaml
 services:
   collector:
-    image: docker.io/otel/opentelemetry-collector:latest
+    image: docker.io/otel/opentelemetry-collector-contrib:latest
     ports:
       - 4317:4317
       - 4318:4318
       - 55679:55679
       - 1777:1777
       - 13133:13133
+      - 8888:8888
     volumes:
       - ./otel-config.yaml:/etc/otelcol/config.yaml
+    command: --config=/etc/otelcol/config.yaml
     depends_on:
       - tempo
       - loki
