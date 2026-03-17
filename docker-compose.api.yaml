@@ -1,5 +1,5 @@
 services:
-  auth-api:
+  auth-service:
     restart: always
     build:
       context: ./auth-service
@@ -7,9 +7,24 @@ services:
     ports:
       - 8000:8000
     environment:
-      OTEL_SERVICE_NAME: "auth"
+      OTEL_SERVICE_NAME: "auth-service"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://collector:4317"
       OTEL_NODE_DISABLED_INSTRUMENTATIONS: "fs,net,dns"
+      DB_HOST: "postgres"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  profile-service:
+    restart: always
+    build:
+      context: ./profile-service
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    environment:
+      OTEL_SERVICE_NAME: "profile-service"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://collector:4317"
       DB_HOST: "postgres"
     depends_on:
       postgres:
