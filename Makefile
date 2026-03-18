@@ -5,7 +5,11 @@ endif
 COMPOSE = $(CONTAINER_RUNTIME) compose
 SIGNAL := traces
 COUNT := 3
+USER_COUNT := 100
 DURATION := 5s
+
+trafficgen:
+	$(COMPOSE) --profile scripts run --rm --env USER_COUNT=$(USER_COUNT) trafficgen
 
 telemetrygen:
 	$(COMPOSE) --profile scripts run --rm telemetrygen --otlp-endpoint collector:4317 $(SIGNAL) --otlp-insecure --$(SIGNAL) $(COUNT)

@@ -8,3 +8,13 @@ services:
     profiles:
       - "scripts"
     command: --otlp-endpoint "collector"
+  trafficgen:
+    build:
+      context: ./gen-traffic
+      dockerfile: Dockerfile
+    profiles:
+      - "scripts"
+    environment:
+      USER_COUNT: ${USER_COUNT:-100}
+      AUTH_URL: http://auth-service:8000
+      PROFILE_URL: http://profile-service:8080

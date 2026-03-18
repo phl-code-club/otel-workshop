@@ -38,14 +38,26 @@ services:
       - postgres:/data/db
       - ./db/:/docker-entrypoint-initdb.d/
     environment:
-      - POSTGRES_USER=phlcodeclub
-      - POSTGRES_PASSWORD=super-secret-password
-      - POSTGRES_DB=otel
+      POSTGRES_USER: phlcodeclub
+      POSTGRES_PASSWORD: super-secret-password
+      POSTGRES_DB: otel
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U phlcodeclub -d otel"]
       interval: 5s
       timeout: 3s
       retries: 3
+
+  postgres-exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter
+    environment:
+      DATASOURCE_URI: postgres:4321/otel?sslmode=disable
+      DATASOURCE_USER: phlcodeclub
+      DATASOURCE_PASS: super-secret-password
+    ports:
+      - 9187:9187
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres:

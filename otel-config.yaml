@@ -21,6 +21,12 @@ receivers:
             - targets:
                 - "redpanda:9644"
           metrics_path: /public_metrics
+        - job_name: "postgres"
+          scrape_interval: 20s
+          scrape_timeout: 10s
+          static_configs:
+            - targets:
+                - "postgres-exporter:9187"
 
 exporters:
   otlp_http/loki:
