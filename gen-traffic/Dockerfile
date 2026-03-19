@@ -1,4 +1,4 @@
-FROM golang:1.25-alpine AS builder
+FROM docker.io/golang:1.25-alpine AS builder
 
 WORKDIR /var/app
 
@@ -6,7 +6,7 @@ COPY . .
 
 RUN go build -o gen-traffic .
 
-FROM alpine AS runner
+FROM docker.io/alpine AS runner
 
 WORKDIR /var/app
 

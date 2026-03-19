@@ -14,6 +14,8 @@ datasources:
     uid: tempo
     jsonData:
       httpMethod: GET
+      serviceMap:
+        datasourceUid: "prometheus"
     correlations:
       - uid: bffnca20y3ev4d
         sourceUID: tempo

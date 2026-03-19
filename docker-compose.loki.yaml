@@ -3,7 +3,7 @@ volumes:
 
 services:
   loki:
-    image: grafana/loki:latest
+    image: docker.io/grafana/loki:3.5.12
     command: "-config.file=/etc/loki/config.yaml -target=all"
     user: 0:0
     ports:

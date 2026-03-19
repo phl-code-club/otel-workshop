@@ -31,7 +31,7 @@ services:
         condition: service_healthy
 
   postgres:
-    image: postgres:18
+    image: docker.io/postgres:18
     ports:
       - 5432:5432
     volumes:
@@ -48,7 +48,7 @@ services:
       retries: 3
 
   postgres-exporter:
-    image: quay.io/prometheuscommunity/postgres-exporter
+    image: quay.io/prometheuscommunity/postgres-exporter:v0.19.1
     environment:
       DATASOURCE_URI: postgres:4321/otel?sslmode=disable
       DATASOURCE_USER: phlcodeclub

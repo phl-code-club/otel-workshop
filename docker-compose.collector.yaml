@@ -4,7 +4,7 @@ include:
   - docker-compose.prometheus.yaml
 services:
   collector:
-    image: docker.io/otel/opentelemetry-collector-contrib:latest
+    image: docker.io/otel/opentelemetry-collector-contrib:0.147.0
     ports:
       - 4317:4317
       - 4318:4318

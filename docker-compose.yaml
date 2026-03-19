@@ -4,7 +4,7 @@ include:
   - docker-compose.api.yaml
 services:
   telemetrygen:
-    image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:latest
+    image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:v0.148.0
     profiles:
       - "scripts"
     command: --otlp-endpoint "collector"

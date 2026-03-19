@@ -3,7 +3,7 @@ volumes:
 
 services:
   tempo:
-    image: grafana/tempo:latest
+    image: docker.io/grafana/tempo:2.10.3
     # These two flags are pretty straightforward
     # -target=all just tells Tempo to run all of it's services inside a single process.
     # -config=path/to/config just tells Tempo where to find its config file.
@@ -18,7 +18,7 @@ services:
       - redpanda
   # Apparently Tempo REQUIRES a Kafka queue now, and RedPanda is the easiest to setup
   redpanda:
-    image: redpandadata/redpanda:latest
+    image: docker.io/redpandadata/redpanda:v25.3.10
     ports:
       - "9092:9092" # Kafka API for clients
     # Starts our Kafka compatible queue. The flags are just used for local dev:

@@ -1,6 +1,6 @@
 services:
   grafana:
-    image: grafana/grafana:latest
+    image: docker.io/grafana/grafana:12.3.5
     volumes:
       - ./grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
       - ./grafana-dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml

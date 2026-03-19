@@ -28,6 +28,9 @@ receivers:
             - targets:
                 - "postgres-exporter:9187"
 
+connectors:
+  servicegraph:
+
 exporters:
   otlp_http/loki:
     endpoint: http://loki:3100/otlp
@@ -40,6 +43,11 @@ exporters:
   prometheus:
     endpoint: "0.0.0.0:9090"
     translation_strategy: "UnderscoreEscapingWithoutSuffixes"
+
+  prometheus/servicegraph:
+    endpoint: "0.0.0.0:9091"
+    translation_strategy: "UnderscoreEscapingWithoutSuffixes"
+    namespace: servicegraph
 
   debug:
     verbosity: detailed
@@ -67,17 +75,23 @@ service:
       receivers:
         - otlp
       exporters:
+        - debug
         - otlp_grpc/tempo
+        - servicegraph
     metrics:
       receivers:
         - otlp
         - prometheus
+        - servicegraph
       exporters:
+        - debug
         - prometheus
+        - prometheus/servicegraph
     logs:
       receivers:
         - otlp
       exporters:
+        - debug
         - otlp_http/loki
   telemetry:
     resource:
