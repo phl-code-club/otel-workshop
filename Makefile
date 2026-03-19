@@ -8,6 +8,15 @@ COUNT := 3
 USER_COUNT := 100
 DURATION := 5s
 
+build:
+	$(COMPOSE) --profile default --profile scripts build
+
+up:
+	$(COMPOSE) up $(ARGS)
+
+logs:
+	$(COMPOSE) logs $(SERVICE) $(ARGS)
+
 trafficgen:
 	$(COMPOSE) --profile scripts run --rm --env USER_COUNT=$(USER_COUNT) trafficgen
 
@@ -16,9 +25,3 @@ telemetrygen:
 
 telemetrygen-dur:
 	$(COMPOSE) --profile scripts run --rm telemetrygen --otlp-endpoint collector:4317 $(SIGNAL) --otlp-insecure --duration $(DURATION)
-
-up:
-	$(COMPOSE) up $(ARGS)
-
-logs:
-	$(COMPOSE) logs $(SERVICE) $(ARGS)

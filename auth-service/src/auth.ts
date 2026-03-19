@@ -51,6 +51,7 @@ async function signUp(req: Request, res: Response) {
     if (!token) {
       throw new Error("error generating token")
     }
+    logger.info("Signed up user", { userID: user.id })
     span.end()
     return res.status(201).json({ user: user, token })
   }
@@ -109,6 +110,7 @@ async function signIn(req: Request, res: Response) {
       throw new Error("error generating token")
     }
     delete user.password_hash
+    logger.info("Signed in user", { userID: user.id })
     span.end()
     return res.status(201).json({ user, token })
   }
@@ -146,6 +148,7 @@ async function getUser(_req: Request, res: Response) {
 
     const user = result.rows[0]
 
+    logger.info("Found user", { userID: user.id })
     return res.status(201).json({ user: user })
   }
   catch (error) {

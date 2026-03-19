@@ -31,6 +31,7 @@ export async function validateJWT(
       const userID = decodedToken.id
 
       res.locals.user = userID
+      logger.info("Validated token", { userID })
       span.end()
       next()
     }

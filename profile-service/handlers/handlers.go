@@ -123,6 +123,7 @@ func ValidateUser(handler http.HandlerFunc) http.HandlerFunc {
 		ctx = context.WithValue(r.Context(), userKey, responseBody.User.ID)
 		r = r.WithContext(ctx)
 		r.Context().Value(userKey)
+		logger.Info("Validated Token", "userID", responseBody.User.ID)
 		handler(w, r)
 	}
 }
@@ -162,6 +163,7 @@ func (s *Session) GetProfile(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error writing response", http.StatusInternalServerError)
 		return
 	}
+	logger.Info("Got profile", "profileID", profile.ID)
 }
 
 func (s *Session) UpdateProfile(w http.ResponseWriter, r *http.Request) {
@@ -217,4 +219,5 @@ func (s *Session) UpdateProfile(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error writing response", http.StatusInternalServerError)
 		return
 	}
+	logger.Info("Upserted profile", "profileID", profile.ID)
 }

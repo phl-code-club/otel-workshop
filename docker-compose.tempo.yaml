@@ -3,7 +3,8 @@ volumes:
 
 services:
   tempo:
-    image: docker.io/grafana/tempo:2.10.3
+    # For some reason Trace metrics are broken on the latest stable release :(
+    image: docker.io/grafana/tempo:main-b378c2e
     # These two flags are pretty straightforward
     # -target=all just tells Tempo to run all of it's services inside a single process.
     # -config=path/to/config just tells Tempo where to find its config file.
