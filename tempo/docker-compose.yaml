@@ -8,9 +8,9 @@ services:
     # These two flags are pretty straightforward
     # -target=all just tells Tempo to run all of it's services inside a single process.
     # -config=path/to/config just tells Tempo where to find its config file.
-    command: "-target=all -config.file=/etc/tempo.yaml"
+    command: "-target=all -config.file=/etc/config.yaml"
     volumes:
-      - ./tempo.yaml:/etc/tempo.yaml
+      - ./config.yaml:/etc/config.yaml
       # We use a named volume here to avoid weird permissions issues with this container
       - tempo:/var/tempo/
     ports:

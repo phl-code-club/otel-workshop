@@ -1,7 +1,7 @@
 include:
-  - docker-compose.tempo.yaml
-  - docker-compose.loki.yaml
-  - docker-compose.prometheus.yaml
+  - ../tempo/docker-compose.yaml
+  - ../loki/docker-compose.yaml
+  - ../prometheus/docker-compose.yaml
 services:
   collector:
     image: docker.io/otel/opentelemetry-collector-contrib:0.147.0
@@ -12,7 +12,7 @@ services:
       - 13133:13133
       - 8888:8888
     volumes:
-      - ./otel-config.yaml:/etc/otelcol/config.yaml
+      - ./config.yaml:/etc/otelcol/config.yaml
     command: --config=/etc/otelcol/config.yaml
     depends_on:
       - tempo
