@@ -2,9 +2,11 @@ include:
   - ../tempo/docker-compose.yaml
   - ../loki/docker-compose.yaml
   - ../prometheus/docker-compose.yaml
+
 services:
   collector:
     image: docker.io/otel/opentelemetry-collector-contrib:0.147.0
+    container_name: collector
     ports:
       - 4317:4317
       - 4318:4318
@@ -18,3 +20,8 @@ services:
       - tempo
       - loki
       - prometheus
+    healthcheck:
+      test: ["CMD", "wget", "http://localhost:13133/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 3

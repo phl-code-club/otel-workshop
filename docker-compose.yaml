@@ -1,16 +1,20 @@
 include:
   - ./collector/docker-compose.yaml
   - ./grafana/docker-compose.yaml
+  - ./auth-service/docker-compose.yaml
+  - ./profile-service/docker-compose.yaml
 services:
   telemetrygen:
     image: ghcr.io/open-telemetry/opentelemetry-collector-contrib/telemetrygen:v0.148.0
+    container_name: telemetrygen
     profiles:
       - "scripts"
     command: --otlp-endpoint "collector"
   trafficgen:
     build:
-      context: ./gen-traffic
+      context: ./trafficgen
       dockerfile: Dockerfile
+    container_name: trafficgen
     profiles:
       - "scripts"
     environment:

@@ -4,12 +4,12 @@ WORKDIR /var/app
 
 COPY . .
 
-RUN go build -o gen-traffic .
+RUN go build -o trafficgen .
 
 FROM docker.io/alpine AS runner
 
 WORKDIR /var/app
 
-COPY --from=builder /var/app/gen-traffic .
+COPY --from=builder /var/app/trafficgen .
 
-CMD ./gen-traffic
+CMD ./trafficgen

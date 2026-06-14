@@ -1,4 +1,62 @@
-# Otel Workshop
+# Logs, Traces, Metrics, Oh My
+
+## Introduction
+
+Hello and welcome to our [OpenTelemetry](https://opentelemetry.io) workshop.
+Today you will be setting up an [OTel Collector](https://opentelemetry.io/docs/collector),
+a small proxy service for moving telemetry data, sometimes called _signals_,
+from place to place. This workshop is mostly self-guided, outside of the short
+tutorial in this README and the short slideshow found [here](./slides.pdf). We
+want to encourage you to experiment, break things, and ask questions! Don't be shy
+about talking to your neighbors as well. Learning is better when it's done together :)
+
+### What Is Telemetry
+
+> Telemetry is derived from the Greek roots _tele_, meaning "far off" and _metron_,
+> "measure".
+
+Telemetry is all the information about a _remote system_. Some examples of Telemetry data:
+
+- A reading from a mass spectrometer
+- The speed of a car being measured by its speedometer
+- That text you sent your boss to tell them you are running late for the 3rd time
+this week
+  - But only in the most abstract sense :p
+
+In our case, it is our information about **running software**. This can be things
+like memory usage, network packets sent, information about HTTP requests, etc.
+
+### Why Is Telemetry
+
+Telemetry allows you to peer into remote systems and retrieve data about that system.
+There are tons of great uses for telemetry data, including:
+
+- Optimizing a web-server to reduce request latency
+- Reading logs from a piece of software to see why it's behavior doesn't match
+your expectation
+- Tracing an error in a distributed system to find the specific service that
+failed and why
+
+### When Is Telemetry
+
+Ideally any time your software is running it should be keeping information about
+itself.
+
+### Who Is Telemetry
+
+What ever is having information about it measured. For our use case, this is software.
+
+### Where Is Telemetry
+
+This is the focus of this workshop!
+
+## What We Are Not Covering
+
+- How Docker and similar container runtimes work
+- How to scale these systems in production
+  - We are happy to chat about that though, it's just out of scope for this tutorial
+- The specifics of the OTLP spec
+- The internals of the storage backends
 
 ## Requirements
 
@@ -12,13 +70,18 @@
   - [Make for Windows](https://gnuwin32.sourceforge.net/packages/make.htm)
     - I don't have a Windows machine so YMMV
 
+## Tutorial
+
+Head on over [here]() to start setting up the OTel Collector!
+
 ## Overview
 
 This is a simple service to service flow to demonstrate the capabilities of OpenTelemetry.
-We have an `Auth` service to create, validate and get users and a `Profile` service
-to create, update and get profile data. This flows into our `OpenTelemetry Collector`,
-which takes all our signals and forwards them to their respective storage systems.
-Speaking of telemetry storage systems, we are using the _LGTM_ stack:
+We have an [Auth service](./auth-service/) to create, validate and get users and
+a [Profile service](./profile-service/) to create, update and get profile data.
+This flows into our [OpenTelemetry Collector](./collector/), which takes all our
+signals and forwards them to their respective storage systems. Speaking of
+telemetry storage systems, we are using the _LGTM_ stack:
 
 - `Loki` for logs
 - `Grafana` for our UI
@@ -129,7 +192,7 @@ Data store for metrics
 - Scrapes data from the Collector on port `9090` (This port isn't exposed on the
 collector container because it would conflict with the Prometheus container)
 
-## Grafana
+### Grafana
 
 Grafana is our visualization tool. It pulls in data from our sources to let us
 create graphs and dashboards.
@@ -138,7 +201,7 @@ The `Grafana` container exposes port `3000`. Just load up `http//localhost:3000`
 
 ## Starting the Services
 
-First we want to build out local images by running: `make`
+First we want to build our local images by running: `make`
 
 Then to bring up the services defined here you can run `make up`. This will start
 the services in the current terminal. If you want to start them detached you can
@@ -178,7 +241,7 @@ For example, we could use the following to send 5 logs: `make SIGNAL=logs COUNT=
 
 Here are links to all the technologies we used:
 
-- [Otel Collector](https://github.com/open-telemetry/opentelemetry-collector-contrib)
+- [OTel Collector](https://github.com/open-telemetry/opentelemetry-collector-contrib)
 - [Loki](https://github.com/grafana/loki)
 - [Grafana](https://github.com/grafana/grafana)
 - [Tempo](https://github.com/grafana/tempo)

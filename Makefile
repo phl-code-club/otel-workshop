@@ -25,3 +25,6 @@ telemetrygen:
 
 telemetrygen-dur:
 	$(COMPOSE) --profile scripts run --rm telemetrygen --otlp-endpoint collector:4317 $(SIGNAL) --otlp-insecure --duration $(DURATION)
+
+restart-collector:
+	$(COMPOSE) restart collector $(ARGS)

@@ -1,0 +1,20 @@
+include:
+  - ../postgres/docker-compose.yaml
+
+services:
+  auth-service:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: auth-service
+    ports:
+      - 8000:8000
+    environment:
+      OTEL_SERVICE_NAME: "auth-service"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://collector:4317"
+      OTEL_NODE_DISABLED_INSTRUMENTATIONS: "fs,net,dns"
+      DB_HOST: "postgres"
+    depends_on:
+      postgres:
+        condition: service_healthy

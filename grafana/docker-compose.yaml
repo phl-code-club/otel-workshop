@@ -1,9 +1,10 @@
 services:
   grafana:
     image: docker.io/grafana/grafana:12.3.5
+    container_name: grafana
     volumes:
-      - ./grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
-      - ./grafana-dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+      - ./datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
       - ./dashboards/:/var/lib/grafana/dashboards/
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true

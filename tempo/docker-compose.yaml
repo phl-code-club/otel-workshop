@@ -9,6 +9,7 @@ services:
     # -target=all just tells Tempo to run all of it's services inside a single process.
     # -config=path/to/config just tells Tempo where to find its config file.
     command: "-target=all -config.file=/etc/config.yaml"
+    container_name: tempo
     volumes:
       - ./config.yaml:/etc/config.yaml
       # We use a named volume here to avoid weird permissions issues with this container
@@ -20,6 +21,7 @@ services:
   # Apparently Tempo REQUIRES a Kafka queue now, and RedPanda is the easiest to setup
   redpanda:
     image: docker.io/redpandadata/redpanda:v25.3.10
+    container_name: redpanda
     ports:
       - "9092:9092" # Kafka API for clients
     # Starts our Kafka compatible queue. The flags are just used for local dev:

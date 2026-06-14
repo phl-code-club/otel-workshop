@@ -1,13 +1,14 @@
 services:
   prometheus:
+    container_name: prometheus
     image: docker.io/prom/prometheus:v3.10.0
     command:
-      - "--config.file=/etc/config.yml"
+      - "--config.file=/etc/config.yaml"
     ports:
       - 9090:9090
     restart: unless-stopped
     volumes:
-      - ./config.yml:/etc/config.yml
+      - ./config.yaml:/etc/config.yaml
       - prom_data:/prometheus
 volumes:
   prom_data:
