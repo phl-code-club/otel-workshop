@@ -74,7 +74,7 @@ Lastly we just need to tell our pipeline to use this exporter for our traces.
 Add a new entry to the `traces` service pipeline `exporters` list like so:
 
 ```
-services:
+service:
   ...
   pipelines:
     ...
@@ -92,6 +92,8 @@ traces flowing from the services, to the collector, and out to our Tempo data st
 If you then run the `make gentelemetry` script it will send some dummy traces to
 the collector. To validate this you can check inside the
 [Grafana traces drilldown](http://localhost:3000/a/grafana-exploretraces-app/explore).
+
+TODO: PUT IN SCREENSHOT
 
 ### Logging with Loki
 
@@ -115,7 +117,7 @@ exporters:
 Add a new entry to the `logs` service pipeline `exporters` list like so:
 
 ```
-services:
+service:
   ...
   pipelines:
     ...
@@ -134,12 +136,14 @@ If you then run the `make SIGNAL=logs gentelemetry` script it will send some
 dummy logs to the collector. To validate this you can check inside the
 [Grafana logs drilldown](http://localhost:3000/a/grafana-lokiexplore-app/explore).
 
+TODO: PUT IN SCREENSHOT
+
 ### The Big Fish, Metrics with Prometheus
 
 This one is going to require a pretty significant amount of changes. We accept
-metrics via OTLP from our collector and our auth and profile services. However,
-we also want to collect metrics about our postgres instance and our redpanda instance.
-To do this we will be using the [Prometheus Receiver](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/prometheusreceiver/README.md).
+metrics via OTLP from our auth and profile services. However, we also want to
+collect metrics about our postgres instance and our redpanda instance. To do this
+we will be using the [Prometheus Receiver](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/prometheusreceiver/README.md).
 
 #### Receiving Metrics
 
@@ -210,7 +214,7 @@ Now we need to add this new receiver to our `metrics` service pipeline
 `receivers` list:
 
 ```
-services:
+service:
   ...
   pipelines:
     ...
@@ -262,7 +266,7 @@ exporters:
 Now we just need to add it to our `metrics` service pipeline `exporters` list:
 
 ```
-services:
+service:
   ...
   pipelines:
     ...
@@ -283,3 +287,174 @@ If you wait a bit you should start getting metrics from our services,
 but if you want to send some dummy metrics you can do so with
 `make SIGNAL=metrics gentelemetry`. To validate this you can check inside the
 [Grafana metrics drilldown](http://localhost:3000/a/grafana-metricsdrilldown-app/drilldown).
+
+TODO: PUT IN SCREENSHOT
+
+## Setting Up the Service Graph
+
+A really cool thing we can do with these telemetry signals is build a dynamic mapping
+of the connections between our services. We will do this using a `connector`. From
+the docs:
+
+> Connectors connect two pipelines, acting as both exporter and receiver.
+
+We will be using the [servicegraph](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/connector/servicegraphconnector/README.md)
+connector to take our traces and pipe them into our metrics pipeline. First,
+let's add a `connectors` key to the root object, and add a `servicegraph` key to
+that object:
+
+```
+receivers:
+  ...
+
++ connectors:
++   servicegraph:
+
+exporters:
+  ...
+```
+
+Next we will setup another Prometheus exporter to handle our servicegraph data:
+
+```
+exporters:
+  ...
+  prometheus:
+    ...
++ prometheus/servicegraph:
++   endpoint: "0.0.0.0:9091"
++   translation_strategy: "UnderscoreEscapingWithoutSuffixes"
++   namespace: servicegraph
++   resource_to_telemetry_conversion:
++     enabled: true
+```
+
+Notice how we added the `/servicegraph` to the end. This is how you can use
+multiple of the same type of exporter. The schema is `<exporter type>/<unique name>`.
+Using this means the exporter we are using is the `prometheus` type with a unique
+name of `servicegraph`. The configuration is almost identical to our earlier prometheus
+exporter. The only differences are:
+
+- It's running on port `9091` instead of `9090`
+- We explicitly assign a namespace of `servicegraph`
+
+Now that we have an exporter, let's connect our traces to metrics using the connector!
+First add the connector as an exporter for our `traces` pipeline:
+
+```
+service:
+  ...
+  pipelines:
+    ...
+    traces:
+      receivers:
+        - otlp
+      exporters:
+        - debug
+        - otlp_grpc
++       - servicegraph
+```
+
+This sends our traces into the connector for processing. Now we need to add the
+connector as a receiver and `prometheus/servicegraph` as an exporter for our
+`metrics` pipeline:
+
+```
+service:
+  ...
+  pipelines:
+    ...
+    metrics:
+      receivers:
+        - otlp
+        - prometheus
++       - servicegraph
+      exporters:
+        - debug
+        - prometheus
++       - prometheus/servicegraph
+```
+
+And with that we will be exposing our service graph info to our Prometheus
+backend. Here is how you can view this information:
+
+1. Navigate to [Explore](http://localhost:3000/explore).
+2. Select the _Tempo_ data source.
+3. Select the `Service Graph` query type.
+4. Run a query.
+
+TODO: PUT IN SCREENSHOT
+
+## Collecting the Collector
+
+A really neat part of using the OTel Collector is that we can use it to collect
+internal telemetry _about_ the collector! This can be stuff like the number of
+signals queued for export, resource utilization, and error rate.
+
+This is going to mostly just be a copy paste, but if you are interested you can
+read more about it [in the docs](https://opentelemetry.io/docs/collector/internal-telemetry/).
+
+The reason we aren't diving deeper into this is because this area is still under
+active development, so this can change pretty rapidly. You just need to add a
+`telemetry` key to the `service` object that describes the internal telemetry you
+want to expose, and how you want to expose it.
+
+```
+service:
+  ...
+  pipelines:
+    ...
++ telemetry:
++   resource:
++     service.name: otel-collector
++   metrics:
++     level: detailed
++     readers:
++       - periodic:
++           exporter:
++             otlp:
++               protocol: http/protobuf
++               endpoint: http://localhost:4318
++   logs:
++     processors:
++       - batch:
++           exporter:
++             otlp:
++               protocol: http/protobuf
++               endpoint: http://localhost:4318
++   traces:
++     processors:
++       - batch:
++           exporter:
++             otlp:
++               protocol: http/protobuf
++               endpoint: http://localhost:4318
+```
+
+Now it's a good idea to disable the debug exporters as we will be sending so much
+data through and it will become even noisier than it already is:
+
+```
+service:
+  pipelines:
+    traces:
+      ...
+      exporters:
+-       - debug
+        - otlp_grpc
+        - servicegraph
+    logs:
+      ...
+      exporters:
+-       - debug
+        - otlp_http
+    metrics:
+      ...
+      exporters:
+-       - debug
+        - prometheus
+        - prometheus/servicegraph
+```
+
+If you restart the collector again and wait a little bit you can check Grafana
+for data about the collector!

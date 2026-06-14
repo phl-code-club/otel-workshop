@@ -38,14 +38,3 @@ service:
         - otlp
       exporters:
         - debug
-  telemetry:
-    resource:
-      service.name: otel-collector
-    metrics:
-      level: detailed
-      readers:
-        - periodic:
-            exporter:
-              otlp:
-                protocol: http/protobuf
-                endpoint: http://localhost:4318
