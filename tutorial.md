@@ -15,12 +15,12 @@ and [Prometheus](./prometheus/) scraping.
 
 Once you have met all the [requirements](/README.md#requirements), you can run
 `make up` to bring all the services up. The base collector takes in telemetry
-signals and prints them to out to the console. There will be a _lot_ of noise
+signals and prints them out to the console. There will be a _lot_ of noise
 from the other services, but you should see something similar to this:
 
 ![Collector debug output screenshot](./screenshots/collector-debug-output.png)
 
-Great! Now we are collecting information from our running services. Now we will
+Great! Now we are collecting information from our running services. Next we will
 work on _storing_ that data so we can utilize it in things like visualizations.
 
 ## Storing Data

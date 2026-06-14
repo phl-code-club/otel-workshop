@@ -72,7 +72,7 @@ This is the focus of this workshop!
 
 ## Tutorial
 
-Head on over [here]() to start setting up the OTel Collector!
+Head on over [here](./tutorial.md) to start setting up the OTel Collector!
 
 ## Overview
 
