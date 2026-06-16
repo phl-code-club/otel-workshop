@@ -8,7 +8,7 @@ receivers:
 
 exporters:
   debug:
-    verbosity: detailed
+    verbosity: normal
     sampling_initial: 5
     sampling_thereafter: 200
 

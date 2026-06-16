@@ -89,7 +89,7 @@ service:
 Just restart your collector with `make restart-collector`. Now you should have
 traces flowing from the services, to the collector, and out to our Tempo data store.
 
-If you then run the `make gentelemetry` script it will send some dummy traces to
+If you then run the `make telemetrygen` script it will send some dummy traces to
 the collector. To validate this you can check inside the
 [Grafana traces drilldown](http://localhost:3000/a/grafana-exploretraces-app/explore).
 
@@ -132,7 +132,7 @@ service:
 Just restart your collector with `make restart-collector`. Now you should have
 logs flowing from the services, to the collector, and out to our Loki data store.
 
-If you then run the `make SIGNAL=logs gentelemetry` script it will send some
+If you then run the `make SIGNAL=logs telemetrygen` script it will send some
 dummy logs to the collector. To validate this you can check inside the
 [Grafana logs drilldown](http://localhost:3000/a/grafana-lokiexplore-app/explore).
 
@@ -155,7 +155,7 @@ receivers:
   ...
 + prometheus:
 +   config:
-+   scrape_configs:
++     scrape_configs:
 ```
 
 Now we need to tell this receiver where to scrape metrics from. The scrape config needs the following information:
@@ -285,7 +285,7 @@ data store.
 
 If you wait a bit you should start getting metrics from our services,
 but if you want to send some dummy metrics you can do so with
-`make SIGNAL=metrics gentelemetry`. To validate this you can check inside the
+`make SIGNAL=metrics telemetrygen`. To validate this you can check inside the
 [Grafana metrics drilldown](http://localhost:3000/a/grafana-metricsdrilldown-app/drilldown).
 
 TODO: PUT IN SCREENSHOT
@@ -375,6 +375,8 @@ service:
 +       - prometheus/servicegraph
 ```
 
+Now restart the collector again and this time run `make trafficgen`. This will
+send some dummy requests into our services instead of directly to the collector.
 And with that we will be exposing our service graph info to our Prometheus
 backend. Here is how you can view this information:
 
