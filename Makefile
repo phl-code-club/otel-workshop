@@ -14,6 +14,9 @@ build:
 up:
 	$(COMPOSE) up $(ARGS)
 
+down:
+	$(COMPOSE) down --remove-orphans $(ARGS)
+
 logs:
 	$(COMPOSE) logs $(SERVICE) $(ARGS)
 
