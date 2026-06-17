@@ -1,4 +1,4 @@
-module gen-traffic
+module trafficgen
 
 go 1.25.5
 

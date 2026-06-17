@@ -4,6 +4,7 @@ volumes:
 services:
   loki:
     image: docker.io/grafana/loki:3.5.12
+    container_name: loki
     command: "-config.file=/etc/loki/config.yaml -target=all"
     user: 0:0
     ports:
@@ -11,7 +12,7 @@ services:
       - 7946
       - 9095
     volumes:
-      - ./loki-config.yaml:/etc/loki/config.yaml
+      - ./config.yaml:/etc/loki/config.yaml
       - loki:/loki/
     healthcheck:
       test: ["CMD", "/usr/bin/loki", "-health"]

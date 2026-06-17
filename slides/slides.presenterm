@@ -1,0 +1,134 @@
+---
+theme:
+    name: catppuccin-macchiato
+    override:
+        slide_title:
+          padding_bottom: 0
+          padding_top: 0
+        code:
+            theme_name: Catppuccin-macchiato
+---
+
+```bash +exec_replace +no_background
+figlet -f standard "Logs, Traces," | lolcat -f -S 420
+figlet -f standard "Metrics, Oh My!" | lolcat -f -S 420
+```
+<!-- end_slide-->
+
+Github Repo
+---
+
+![Github Repo Link](./qr-code.png)
+
+<!--end_slide-->
+
+Setting Expectations
+---
+
+What this is:
+
+- A short overview of some basic software observability principals
+- An introduction to how OpenTelemetry (OTel) maps to those principals
+
+What this isn't:
+
+- A deep dive into OpeneTelemetry Protocol (OTLP)
+- An in depth talk about observability in production
+
+<!--end_slide-->
+Overview
+---
+
+Topics we will cover:
+
+- What is Software Observability?
+  - Why does it matter?
+- What is OpenTelemety?
+  - How does it differ from other forms of Observability?
+- What is the OTel Collector?
+- A short explanation of the system diagram and what each piece is.
+<!--end_slide-->
+
+What is Software Observability?
+---
+
+Observability is being able to inspect the runtime state of our software. It
+allows us to see what our software is doing and when. The data that describes
+this is called _telemetry_.
+
+The 3 most common types of telemetry used in modern software are:
+
+- Logs
+- Metrics
+- Traces
+
+<!--end_slide-->
+
+Metrics
+---
+
+Metrics are heuristics about our software that is measured at single points in time.
+This data can then be aggregated and visualized over time. Some examples include:
+
+- CPU Usage
+- Total HTTP Requests
+- Error Rate
+
+<!--end_slide-->
+
+Traces
+---
+
+Traces are information about how software is invoked and what the flow of requests
+and data looks like. The base unit of a trace is the `span`. They can be heirarchical
+and create trees of related spans that you can attach metadata to. Examples include:
+
+- Tracking what services get invoked when you make a particular HTTP request
+- Finding where an error occurred in the chain of calls from a request
+- Checking latency from remote services such as databases or 3rd party API's
+
+<!--end_slide-->
+
+Logs
+---
+
+Logs are the most common form of telemetry. This is usually where people start due
+to how easy they are to generate and capture. However, logs are generally best used
+as a suppliment to metrics and traces. For example:
+
+- Look at the surrounding logs from where a trace errored and see if there was
+anything out of the ordinary
+- Correlating logs with specific HTTP status codes to see what the system was doing
+when it errored
+
+<!--end_slide-->
+
+What is OpenTelemetry (OTel)?
+---
+
+> OpenTelemetry is an open source observability framework for cloud native software. It provides a single set of APIs, libraries, agents, and collector services to capture distributed traces and metrics from your application.
+
+Put simply, OTel is a set of standards, tools, and SDK's for handling telemetry
+data. There are 3 main components that OTel manage:
+
+- OTLP
+  - The OpenTelemetry Protocol. This is a specification for how OTel data should
+  be shaped and transported.
+- OTel SDK's
+  - Reusable libraries that you can use to implement OTLP based observability.
+- OTel Collector
+  - Vendor-agnostic way to receive, process and export telemetry data.
+
+<!--end_slide-->
+
+System Diagram
+---
+
+![System Diagram](../system-diagram.png)
+
+<!--end_slide-->
+
+Github Repo Again
+---
+
+![Github Repo Link](./qr-code.png)
