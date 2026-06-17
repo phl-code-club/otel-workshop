@@ -58,13 +58,48 @@ this is called _telemetry_.
 
 The 3 most common types of telemetry used in modern software are:
 
-- Metrics
-  - Heuristics about our software that is measured at single points in time.
-- Traces
-  - Tracking an action over time, including subactions called `spans`.
 - Logs
-  - Enriching data to handle information that doesn't easily fall into one of
-  the other two types.
+- Metrics
+- Traces
+
+<!--end_slide-->
+
+Metrics
+---
+
+Metrics are heuristics about our software that is measured at single points in time.
+This data can then be aggregated and visualized over time. Some examples include:
+
+- CPU Usage
+- Total HTTP Requests
+- Error Rate
+
+<!--end_slide-->
+
+Traces
+---
+
+Traces are information about how software is invoked and what the flow of requests
+and data looks like. The base unit of a trace is the `span`. They can be heirarchical
+and create trees of related spans that you can attach metadata to. Examples include:
+
+- Tracking what services get invoked when you make a particular HTTP request
+- Finding where an error occurred in the chain of calls from a request
+- Checking latency from remote services such as databases or 3rd party API's
+
+<!--end_slide-->
+
+Logs
+---
+
+Logs are the most common form of telemetry. This is usually where people start due
+to how easy they are to generate and capture. However, logs are generally best used
+as a suppliment to metrics and traces. For example:
+
+- Look at the surrounding logs from where a trace errored and see if there was
+anything out of the ordinary
+- Correlating logs with specific HTTP status codes to see what the system was doing
+when it errored
 
 <!--end_slide-->
 
