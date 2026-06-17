@@ -18,8 +18,6 @@ Once you have met all the [requirements](/README.md#requirements), you can run
 signals and prints them out to the console. There will be a _lot_ of noise
 from the other services, but you should see something similar to this:
 
-![Collector debug output screenshot](./screenshots/collector-debug-output.png)
-
 Great! Now we are collecting information from our running services. Next we will
 work on _storing_ that data so we can utilize it in things like visualizations.
 
@@ -93,8 +91,6 @@ If you then run the `make telemetrygen` script it will send some dummy traces to
 the collector. To validate this you can check inside the
 [Grafana traces drilldown](http://localhost:3000/a/grafana-exploretraces-app/explore).
 
-TODO: PUT IN SCREENSHOT
-
 ### Logging with Loki
 
 Next we are going to get _logs_ working through our system. This will pretty similar to _traces_.
@@ -135,8 +131,6 @@ logs flowing from the services, to the collector, and out to our Loki data store
 If you then run the `make SIGNAL=logs telemetrygen` script it will send some
 dummy logs to the collector. To validate this you can check inside the
 [Grafana logs drilldown](http://localhost:3000/a/grafana-lokiexplore-app/explore).
-
-TODO: PUT IN SCREENSHOT
 
 ### The Big Fish, Metrics with Prometheus
 
@@ -288,8 +282,6 @@ but if you want to send some dummy metrics you can do so with
 `make SIGNAL=metrics telemetrygen`. To validate this you can check inside the
 [Grafana metrics drilldown](http://localhost:3000/a/grafana-metricsdrilldown-app/drilldown).
 
-TODO: PUT IN SCREENSHOT
-
 ## Setting Up the Service Graph
 
 A really cool thing we can do with these telemetry signals is build a dynamic mapping
@@ -385,8 +377,6 @@ backend. Here is how you can view this information:
 3. Select the `Service Graph` query type.
 4. Run a query.
 
-TODO: PUT IN SCREENSHOT
-
 ## Collecting the Collector
 
 A really neat part of using the OTel Collector is that we can use it to collect
@@ -460,3 +450,34 @@ service:
 
 If you restart the collector again and wait a little bit you can check Grafana
 for data about the collector!
+
+## Next Steps
+
+Now that everything is running, poke around a bit. Read some of the Docker compose
+files to see how the services are set up. Try reading through some of the service
+code to get a better idea of how to instrument services.
+
+Once you have a better grasp on the setup here are some ideas for what you can
+do next:
+
+- Create a custom [Grafana Dashboard](https://grafana.com/docs/grafana/latest/fundamentals/getting-started/first-dashboards/)
+- Add a new service and instrument it using the [OTel SDK's](https://opentelemetry.io/docs/languages/)
+- Setup up another exporter
+  - OSS
+    - [SigNoz](https://signoz.io/docs/migration/migrate-from-grafana-to-signoz/)
+    - [Uptrace](https://uptrace.dev/opentelemetry)
+    - [OpenObserve](https://openobserve.ai/docs/ingestion/)
+  - Cloud
+    - [Datadog](https://docs.datadoghq.com/opentelemetry/)
+    - [New Relic](https://newrelic.com/solutions/opentelemetry)
+    - [PostHog](https://posthog.com/) (They sponsor us, so let them know we sent you!)
+    - [Sentry](https://docs.sentry.io/concepts/otlp/) (We are collaborating with them in July!)
+
+## Thanks
+
+Thanks so much for spending the time working on this :D We love getting to put
+together these fun events and hope to see you again soon!
+
+_XoXo_,
+
+_PHL Code Club_

@@ -88,6 +88,9 @@ data. There are 3 main components that OTel manage:
 
 System Diagram
 ---
+
+![System Diagram](../system-diagram.png)
+
 <!--end_slide-->
 
 Github Repo Again

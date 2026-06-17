@@ -94,7 +94,7 @@ That sure looks good to me...
 
 Below we have a diagram explaining how data flows between these services
 
-![data flow diagram](./system-diagram.svg)
+![data flow diagram](./system-diagram.png)
 
 ### Auth Service
 
