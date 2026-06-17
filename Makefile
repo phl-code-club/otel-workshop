@@ -31,3 +31,6 @@ telemetrygen-dur:
 
 restart-collector:
 	$(COMPOSE) restart collector $(ARGS)
+
+restart-servicegraph:
+	$(COMPOSE) restart grafana prometheus collector $(ARGS)

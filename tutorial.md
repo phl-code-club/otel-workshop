@@ -18,6 +18,8 @@ Once you have met all the [requirements](/README.md#requirements), you can run
 signals and prints them out to the console. There will be a _lot_ of noise
 from the other services, but you should see something similar to this:
 
+![Collector Debug Output](./screenshots/collector-debug-output.png)
+
 Great! Now we are collecting information from our running services. Next we will
 work on _storing_ that data so we can utilize it in things like visualizations.
 
@@ -33,7 +35,7 @@ We will be utilizing the _LGTM_ stack for our telemetry data storage.
 
 ### Tracing with Tempo
 
-The easiest signal to setup are `traces`. This is because both the `receiver`
+The easiest signal to set up are `traces`. This is because both the `receiver`
 _and_ the `exporter` use OTLP. Since OTLP is already set up as a `receiver`,
 which means we just need to add the `exporter`.
 
@@ -91,6 +93,8 @@ If you then run the `make telemetrygen` script it will send some dummy traces to
 the collector. To validate this you can check inside the
 [Grafana traces drilldown](http://localhost:3000/a/grafana-exploretraces-app/explore).
 
+![Traces Drilldown](./screenshots/traces-drilldown.png)
+
 ### Logging with Loki
 
 Next we are going to get _logs_ working through our system. This will pretty similar to _traces_.
@@ -128,9 +132,11 @@ service:
 Just restart your collector with `make restart-collector`. Now you should have
 logs flowing from the services, to the collector, and out to our Loki data store.
 
-If you then run the `make SIGNAL=logs telemetrygen` script it will send some
-dummy logs to the collector. To validate this you can check inside the
+If you then run the `make SIGNAL=logs COUNT=10 telemetrygen` script it will send
+some dummy logs to the collector. To validate this you can check inside the
 [Grafana logs drilldown](http://localhost:3000/a/grafana-lokiexplore-app/explore).
+
+![Logs Drilldown](./screenshots/logs-drilldown.png)
 
 ### The Big Fish, Metrics with Prometheus
 
@@ -279,8 +285,62 @@ data store.
 
 If you wait a bit you should start getting metrics from our services,
 but if you want to send some dummy metrics you can do so with
-`make SIGNAL=metrics telemetrygen`. To validate this you can check inside the
-[Grafana metrics drilldown](http://localhost:3000/a/grafana-metricsdrilldown-app/drilldown).
+`make SIGNAL=metrics DURATION=10s telemetrygen-dur`. To validate this you can
+check inside the [Grafana metrics drilldown](http://localhost:3000/a/grafana-metricsdrilldown-app/drilldown).
+
+![Metrics Drilldown](./screenshots/metrics-drilldown.png)
+
+## Processing
+
+> Processors transform, filter, and enrich telemetry data as it flows through the pipeline.
+
+The OTel Collector has a super powerful component called `processors`. These allow
+you to take the input from a receiver, transform it, and pass it on to the exporter.
+
+The processor we will be using is the [batch](https://github.com/open-telemetry/opentelemetry-collector/tree/v0.154.0/processor/batchprocessor) processor. This reduces load on backend
+services by batching signals into buckets, compressing them, and sending them off
+(reducing the number of connections being made/maintained).
+
+First, add a `processors` section to the root object with a `batch` key:
+
+```
+receivers:
+  ...
+
++ processors: # This should not be indented
++   batch:
+
+exporters:
+  ...
+```
+
+We are good with the defaults for this, but read the linked docs if you want to learn how to configure this.
+
+Now add the processor to each signals pipeline:
+
+```
+service:
+  ...
+  pipelines:
+    traces:
+      ...
++     processors:
++       - batch
+      ...
+    logs:
+      ...
++     processors:
++       - batch
+      ...
+    metrics:
+      ...
++     processors:
++       - batch
+      ...
+```
+
+Then restart the collector and your signals will start getting batched! Our signal
+volume is so low that this doesn't really make a difference.
 
 ## Setting Up the Service Graph
 
@@ -299,7 +359,7 @@ that object:
 receivers:
   ...
 
-+ connectors:
++ connectors: # This should not be indented
 +   servicegraph:
 
 exporters:
@@ -367,15 +427,22 @@ service:
 +       - prometheus/servicegraph
 ```
 
-Now restart the collector again and this time run `make trafficgen`. This will
+Now restart the collector, Grafana, and Prometheus by running
+`make restart-servicegraph` and this time run `make trafficgen`. This will
 send some dummy requests into our services instead of directly to the collector.
-And with that we will be exposing our service graph info to our Prometheus
-backend. Here is how you can view this information:
+This is because the normal `telemetrygen` tool doesn't do
+[context propagation](https://opentelemetry.io/docs/concepts/context-propagation/)
+which is required to load the servicegraph. And with that we will be exposing our
+service graph info to our Prometheus backend. Here is how you can view this information:
 
 1. Navigate to [Explore](http://localhost:3000/explore).
 2. Select the _Tempo_ data source.
 3. Select the `Service Graph` query type.
 4. Run a query.
+
+It should look something like this:
+
+![Servicegraph](./screenshots/servicegraph.png)
 
 ## Collecting the Collector
 

@@ -12,7 +12,7 @@ services:
     command: --otlp-endpoint "collector"
   trafficgen:
     build:
-      context: ./trafficgen
+      context: ./gentraffic
       dockerfile: Dockerfile
     container_name: trafficgen
     profiles:
